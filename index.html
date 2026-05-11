@@ -3,106 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP32 Web Control</title>
+
+  <title>ESP32 Monitoring</title>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
     body{
-      font-family: Arial;
-      padding: 20px;
-      background: #f4f4f4;
+      font-family:Arial;
+      background:#f4f7fb;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
     }
 
     .container{
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
+      width:100%;
+      max-width:700px;
+      text-align:center;
     }
 
-    input{
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
+    h1{
+      margin-bottom:30px;
+      color:#333;
     }
 
-    button{
-      margin-top: 15px;
-      padding: 10px;
-      width: 100%;
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
+    .cards{
+      display:flex;
+      gap:20px;
+      justify-content:center;
+      flex-wrap:wrap;
     }
 
-    .hasil{
-      margin-top: 20px;
-      background: #eee;
-      padding: 10px;
-      border-radius: 5px;
+    .card{
+      background:white;
+      width:250px;
+      padding:30px;
+      border-radius:20px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);
     }
+
+    .title{
+      font-size:20px;
+      color:#666;
+      margin-bottom:15px;
+    }
+
+    .value{
+      font-size:48px;
+      font-weight:bold;
+      color:#2196f3;
+    }
+
+    .unit{
+      font-size:20px;
+      color:#888;
+    }
+
+    .footer{
+      margin-top:30px;
+      color:#666;
+    }
+
   </style>
 </head>
 <body>
 
 <div class="container">
 
-  <h2>Kirim Data ke ESP32</h2>
+  <h1>Monitoring ESP32</h1>
 
-  <input type="text" id="data1" placeholder="Data 1">
-  <input type="text" id="data2" placeholder="Data 2">
-  <input type="text" id="data3" placeholder="Data 3">
+  <div class="cards">
 
-  <button onclick="kirimData()">Kirim</button>
+    <div class="card">
+      <div class="title">Suhu</div>
+      <div>
+        <span class="value" id="suhu">0</span>
+        <span class="unit">°C</span>
+      </div>
+    </div>
 
-  <div class="hasil">
-    <p><b>Response 1:</b> <span id="res1">-</span></p>
-    <p><b>Response 2:</b> <span id="res2">-</span></p>
+    <div class="card">
+      <div class="title">Kelembapan</div>
+      <div>
+        <span class="value" id="kelembapan">0</span>
+        <span class="unit">%</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer" id="status">
+    Menunggu data...
   </div>
 
 </div>
 
 <script>
 
-async function kirimData() {
+  const firebaseConfig = {
+    databaseURL:
+      "https://esp32-monitor-default-rtdb.firebaseio.com"
+  };
 
-  const data1 = document.getElementById("data1").value;
-  const data2 = document.getElementById("data2").value;
-  const data3 = document.getElementById("data3").value;
+  firebase.initializeApp(firebaseConfig);
 
-  // GANTI dengan IP ESP32
-  const url = "http://192.168.1.100/data";
+  const db = firebase.database();
 
-  try {
+  db.ref("sensor").on("value", (snapshot) => {
 
-    // ======================
-    // METODE POST
-    // ======================
+    const data = snapshot.val();
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        data1: data1,
-        data2: data2,
-        data3: data3
-      })
-    });
+    if(data){
 
-    const hasil = await response.json();
+      document.getElementById("suhu").innerHTML =
+        data.suhu;
 
-    document.getElementById("res1").innerText = hasil.response1;
-    document.getElementById("res2").innerText = hasil.response2;
+      document.getElementById("kelembapan").innerHTML =
+        data.kelembapan;
 
-  } catch(err) {
-    alert("Gagal konek ke ESP32");
-    console.log(err);
-  }
-
-}
+      document.getElementById("status").innerHTML =
+        "Data realtime berhasil diterima";
+    }
+  });
 
 </script>
 
