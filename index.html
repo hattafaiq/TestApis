@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Web Control</title>
+
+  <style>
+    body{
+      font-family: Arial;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    .container{
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input{
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    button{
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hasil{
+      margin-top: 20px;
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>Kirim Data ke ESP32</h2>
+
+  <input type="text" id="data1" placeholder="Data 1">
+  <input type="text" id="data2" placeholder="Data 2">
+  <input type="text" id="data3" placeholder="Data 3">
+
+  <button onclick="kirimData()">Kirim</button>
+
+  <div class="hasil">
+    <p><b>Response 1:</b> <span id="res1">-</span></p>
+    <p><b>Response 2:</b> <span id="res2">-</span></p>
+  </div>
+
+</div>
+
+<script>
+
+async function kirimData() {
+
+  const data1 = document.getElementById("data1").value;
+  const data2 = document.getElementById("data2").value;
+  const data3 = document.getElementById("data3").value;
+
+  // GANTI dengan IP ESP32
+  const url = "http://192.168.1.100/data";
+
+  try {
+
+    // ======================
+    // METODE POST
+    // ======================
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        data1: data1,
+        data2: data2,
+        data3: data3
+      })
+    });
+
+    const hasil = await response.json();
+
+    document.getElementById("res1").innerText = hasil.response1;
+    document.getElementById("res2").innerText = hasil.response2;
+
+  } catch(err) {
+    alert("Gagal konek ke ESP32");
+    console.log(err);
+  }
+
+}
+
+</script>
+
+</body>
+</html>
