@@ -1,142 +1,187 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Berita Kita - Cepat & Akurat</title>
+    <style>
+        :root {
+            --primary: #1a202c;
+            --accent: #e53e3e;
+            --gray-light: #f7fafc;
+        }
 
-  <title>ESP32 Monitoring</title>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--gray-light);
+            color: #333;
+        }
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+        /* Navigation */
+        nav {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-  <style>
+        nav .logo { font-size: 1.5rem; font-weight: bold; }
+        nav ul { list-style: none; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; font-size: 0.9rem; }
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+        /* Header / Hero */
+        header {
+            background: white;
+            padding: 2rem 5%;
+            border-bottom: 4px solid var(--accent);
+            margin-bottom: 2rem;
+        }
 
-    body{
-      font-family:Arial;
-      background:#f4f7fb;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-    }
+        /* Main Grid Area */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 3fr 1fr; /* Area Utama & Sidebar */
+            gap: 30px;
+        }
 
-    .container{
-      width:100%;
-      max-width:700px;
-      text-align:center;
-    }
+        /* News Card Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
 
-    h1{
-      margin-bottom:30px;
-      color:#333;
-    }
+        .card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
 
-    .cards{
-      display:flex;
-      gap:20px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
+        .card:hover { transform: translateY(-5px); }
 
-    .card{
-      background:white;
-      width:250px;
-      padding:30px;
-      border-radius:20px;
-      box-shadow:0 4px 15px rgba(0,0,0,0.1);
-    }
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
 
-    .title{
-      font-size:20px;
-      color:#666;
-      margin-bottom:15px;
-    }
+        .card-content { padding: 15px; }
+        .card-tag { 
+            color: var(--accent); 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+        }
 
-    .value{
-      font-size:48px;
-      font-weight:bold;
-      color:#2196f3;
-    }
+        .card-title {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
 
-    .unit{
-      font-size:20px;
-      color:#888;
-    }
+        /* Sidebar */
+        aside .widget {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-    .footer{
-      margin-top:30px;
-      color:#666;
-    }
-
-  </style>
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            nav ul { display: none; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
+    <nav>
+        <div class="logo">BERITA<span>KITA</span></div>
+        <ul>
+            <li><a href="#">Nasional</a></li>
+            <li><a href="#">Teknologi</a></li>
+            <li><a href="#">Ekonomi</a></li>
+            <li><a href="#">Olahraga</a></li>
+        </ul>
+    </nav>
 
-  <h1>Monitoring ESP32</h1>
+    <header>
+        <h1>Berita Terkini Hari Ini</h1>
+        <p>Menyajikan informasi valid dari sumber terpercaya.</p>
+    </header>
 
-  <div class="cards">
+    <div class="container">
+        <!-- Main News Section -->
+        <main>
+            <div class="news-grid">
+                <!-- Card 1 -->
+                <article class="card">
+                    <img src="https://images.unsplash.com/photo-1504711432869-efd597cdd042?auto=format&fit=crop&w=400&q=80" alt="News">
+                    <div class="card-content">
+                        <span class="card-tag">Teknologi</span>
+                        <h3 class="card-title"><a href="berita/berita-1.html" style="color: inherit; text-decoration: none;">AI Semakin Pintar, Bagaimana Masa Depan Pekerjaan?</a></h3>
+                        <p style="font-size: 0.85rem; color: #666;">Dunia teknologi sedang mengalami perubahan besar dengan hadirnya AI...</p>
+                    </div>
+                </article>
 
-    <div class="card">
-      <div class="title">Suhu</div>
-      <div>
-        <span class="value" id="suhu">0</span>
-        <span class="unit">°C</span>
-      </div>
+                <!-- Card 2 -->
+                <article class="card">
+                    <img src="https://images.unsplash.com/photo-1461896756913-647565259432?auto=format&fit=crop&w=400&q=80" alt="News">
+                    <div class="card-content">
+                        <span class="card-tag">Olahraga</span>
+                        <h3 class="card-title">Persiapan Atlet Jelang Kompetisi Internasional</h3>
+                        <p style="font-size: 0.85rem; color: #666;">Para atlet mulai intensif melakukan latihan fisik di pusat pelatihan nasional...</p>
+                    </div>
+                </article>
+
+                <!-- Kamu bisa duplikasi bagian "article" di atas sebanyak yang kamu butuhkan -->
+                <article class="card">
+                    <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=400&q=80" alt="News">
+                    <div class="card-content">
+                        <span class="card-tag">Ekonomi</span>
+                        <h3 class="card-title">Harga Saham Teknologi Melonjak Tajam</h3>
+                        <p style="font-size: 0.85rem; color: #666;">Pasar saham hari ini menunjukkan tren positif khususnya di sektor digital...</p>
+                    </div>
+                </article>
+            </div>
+        </main>
+
+        <!-- Sidebar Section -->
+        <aside>
+            <div class="widget">
+                <h3>Terpopuler</h3>
+                <ul style="padding: 0; list-style: none; font-size: 0.9rem;">
+                    <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <a href="#" style="color: #333; text-decoration: none;">1. Tips Hemat Listrik di Rumah</a>
+                    </li>
+                    <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <a href="#" style="color: #333; text-decoration: none;">2. Destinasi Wisata Tersembunyi di Indonesia</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="widget">
+                <h3>Newsletter</h3>
+                <input type="email" placeholder="Email kamu..." style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                <button style="width: 100%; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer;">Langganan</button>
+            </div>
+        </aside>
     </div>
 
-    <div class="card">
-      <div class="title">Kelembapan</div>
-      <div>
-        <span class="value" id="kelembapan">0</span>
-        <span class="unit">%</span>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="footer" id="status">
-    Menunggu data...
-  </div>
-
-</div>
-
-<script>
-
-  const firebaseConfig = {
-    databaseURL:
-      "https://hallojeck123-default-rtdb.firebaseio.com"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-  const db = firebase.database();
-
-  db.ref("sensor").on("value", (snapshot) => {
-
-    const data = snapshot.val();
-
-    if(data){
-
-      document.getElementById("suhu").innerHTML =
-        data.suhu;
-
-      document.getElementById("kelembapan").innerHTML =
-        data.kelembapan;
-
-      document.getElementById("status").innerHTML =
-        "Data realtime berhasil diterima";
-    }
-  });
-
-</script>
+    <footer style="background: #1a202c; color: white; text-align: center; padding: 2rem; margin-top: 3rem;">
+        <p>&copy; 2024 Portal Berita Kita. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>
