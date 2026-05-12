@@ -3,185 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Berita Kita - Cepat & Akurat</title>
+    <title>News Reader Pro</title>
     <style>
-        :root {
-            --primary: #1a202c;
-            --accent: #e53e3e;
-            --gray-light: #f7fafc;
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: #f0f2f5;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: var(--gray-light);
-            color: #333;
-        }
-
-        /* Navigation */
-        nav {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 5%;
+        /* Sidebar Daftar Berita */
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #ddd;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            flex-direction: column;
         }
 
-        nav .logo { font-size: 1.5rem; font-weight: bold; }
-        nav ul { list-style: none; display: flex; gap: 20px; }
-        nav a { color: white; text-decoration: none; font-size: 0.9rem; }
-
-        /* Header / Hero */
-        header {
-            background: white;
-            padding: 2rem 5%;
-            border-bottom: 4px solid var(--accent);
-            margin-bottom: 2rem;
-        }
-
-        /* Main Grid Area */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 3fr 1fr; /* Area Utama & Sidebar */
-            gap: 30px;
-        }
-
-        /* News Card Grid */
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .card:hover { transform: translateY(-5px); }
-
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-
-        .card-content { padding: 15px; }
-        .card-tag { 
-            color: var(--accent); 
-            font-size: 0.75rem; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-        }
-
-        .card-title {
-            margin: 10px 0;
-            font-size: 1.2rem;
-            line-height: 1.4;
-        }
-
-        /* Sidebar */
-        aside .widget {
-            background: white;
+        .sidebar-header {
             padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background: #1a73e8;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-            nav ul { display: none; }
+        #news-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .news-item:hover { background: #f8f9fa; }
+        .news-item.active { 
+            background: #e8f0fe; 
+            border-left: 4px solid #1a73e8; 
+        }
+
+        .news-item h4 { margin: 0 0 5px 0; font-size: 1rem; color: #333; }
+        .news-item small { color: #777; }
+
+        /* Panel Pembaca Berita */
+        .reader-panel {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-wrapper {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            min-height: 100%;
+        }
+
+        #article-title { font-size: 2.5rem; margin-bottom: 10px; color: #111; }
+        .meta { color: #666; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        #article-body { 
+            line-height: 1.8; 
+            font-size: 1.1rem; 
+            color: #444; 
+            white-space: pre-line; /* Menjaga enter/paragraf dari JSON */
+        }
+
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">BERITA<span>KITA</span></div>
-        <ul>
-            <li><a href="#">Nasional</a></li>
-            <li><a href="#">Teknologi</a></li>
-            <li><a href="#">Ekonomi</a></li>
-            <li><a href="#">Olahraga</a></li>
-        </ul>
-    </nav>
-
-    <header>
-        <h1>Berita Terkini Hari Ini</h1>
-        <p>Menyajikan informasi valid dari sumber terpercaya.</p>
-    </header>
-
-    <div class="container">
-        <!-- Main News Section -->
-        <main>
-            <div class="news-grid">
-                <!-- Card 1 -->
-                <article class="card">
-                    <img src="https://images.unsplash.com/photo-1504711432869-efd597cdd042?auto=format&fit=crop&w=400&q=80" alt="News">
-                    <div class="card-content">
-                        <span class="card-tag">Teknologi</span>
-                        <h3 class="card-title"><a href="berita/berita-1.html" style="color: inherit; text-decoration: none;">AI Semakin Pintar, Bagaimana Masa Depan Pekerjaan?</a></h3>
-                        <p style="font-size: 0.85rem; color: #666;">Dunia teknologi sedang mengalami perubahan besar dengan hadirnya AI...</p>
-                    </div>
-                </article>
-
-                <!-- Card 2 -->
-                <article class="card">
-                    <img src="https://images.unsplash.com/photo-1461896756913-647565259432?auto=format&fit=crop&w=400&q=80" alt="News">
-                    <div class="card-content">
-                        <span class="card-tag">Olahraga</span>
-                        <h3 class="card-title">Persiapan Atlet Jelang Kompetisi Internasional</h3>
-                        <p style="font-size: 0.85rem; color: #666;">Para atlet mulai intensif melakukan latihan fisik di pusat pelatihan nasional...</p>
-                    </div>
-                </article>
-
-                <!-- Kamu bisa duplikasi bagian "article" di atas sebanyak yang kamu butuhkan -->
-                <article class="card">
-                    <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=400&q=80" alt="News">
-                    <div class="card-content">
-                        <span class="card-tag">Ekonomi</span>
-                        <h3 class="card-title">Harga Saham Teknologi Melonjak Tajam</h3>
-                        <p style="font-size: 0.85rem; color: #666;">Pasar saham hari ini menunjukkan tren positif khususnya di sektor digital...</p>
-                    </div>
-                </article>
-            </div>
-        </main>
-
-        <!-- Sidebar Section -->
-        <aside>
-            <div class="widget">
-                <h3>Terpopuler</h3>
-                <ul style="padding: 0; list-style: none; font-size: 0.9rem;">
-                    <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <a href="#" style="color: #333; text-decoration: none;">1. Tips Hemat Listrik di Rumah</a>
-                    </li>
-                    <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <a href="#" style="color: #333; text-decoration: none;">2. Destinasi Wisata Tersembunyi di Indonesia</a>
-                    </li>
-                </ul>
-            </div>
-            
-            <div class="widget">
-                <h3>Newsletter</h3>
-                <input type="email" placeholder="Email kamu..." style="width: 100%; padding: 8px; margin-bottom: 10px;">
-                <button style="width: 100%; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer;">Langganan</button>
-            </div>
-        </aside>
+    <!-- Daftar Berita -->
+    <div class="sidebar">
+        <div class="sidebar-header">Berita Terbaru</div>
+        <div id="news-list">
+            <!-- Item berita akan muncul di sini -->
+        </div>
     </div>
 
-    <footer style="background: #1a202c; color: white; text-align: center; padding: 2rem; margin-top: 3rem;">
-        <p>&copy; 2024 Portal Berita Kita. All rights reserved.</p>
-    </footer>
+    <!-- Konten Pembaca -->
+    <div class="reader-panel">
+        <div id="reader-view" class="content-wrapper" style="display: none;">
+            <h1 id="article-title"></h1>
+            <div class="meta">
+                Oleh: <span id="article-author"></span> | <span id="article-date"></span>
+            </div>
+            <div id="article-body"></div>
+        </div>
+        
+        <div id="no-selection" class="placeholder">
+            Silakan pilih berita di samping untuk membaca.
+        </div>
+    </div>
 
+    <script>
+        let allNews = [];
+
+        // 1. Ambil data dari file JSON
+        async function fetchNews() {
+            try {
+                const response = await fetch('berita.json');
+                allNews = await response.json();
+                renderList(allNews);
+            } catch (err) {
+                console.error("Gagal mengambil file:", err);
+            }
+        }
+
+        // 2. Tampilkan daftar di sidebar
+        function renderList(news) {
+            const listContainer = document.getElementById('news-list');
+            listContainer.innerHTML = news.map(item => `
+                <div class="news-item" onclick="readArticle('${item.id}', this)">
+                    <h4>${item.judul}</h4>
+                    <small>${item.tanggal}</small>
+                </div>
+            `).join('');
+        }
+
+        // 3. Fungsi untuk membaca detail berita
+        function readArticle(id, element) {
+            // Update UI Sidebar Aktif
+            document.querySelectorAll('.news-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // Cari data berita yang cocok
+            const article = allNews.find(n => n.id === id);
+
+            if (article) {
+                document.getElementById('no-selection').style.display = 'none';
+                document.getElementById('reader-view').style.display = 'block';
+                
+                document.getElementById('article-title').innerText = article.judul;
+                document.getElementById('article-author').innerText = article.penulis;
+                document.getElementById('article-date').innerText = article.tanggal;
+                document.getElementById('article-body').innerText = article.isi;
+
+                // Auto scroll ke atas saat ganti berita
+                document.querySelector('.reader-panel').scrollTop = 0;
+            }
+        }
+
+        window.onload = fetchNews;
+    </script>
 </body>
 </html>
